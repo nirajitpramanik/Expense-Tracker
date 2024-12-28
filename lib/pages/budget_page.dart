@@ -182,40 +182,59 @@ class _BudgetPageState extends State<BudgetPage> {
     return ValueListenableBuilder(
       valueListenable: Hive.box('income').listenable(),
       builder: (context, Box box, _) {
-        final incomes = box.values.toList().cast<Map<String, dynamic>>();
+        // Convert the dynamic Map to the correct type safely
+        final incomes = box.values.map((dynamic item) {
+          if (item is Map) {
+            return {
+              'source': item['source']?.toString() ?? '',
+              'amount': (item['amount'] is num) ? (item['amount'] as num).toDouble() : 0.0,
+              'timestamp': item['timestamp']?.toString() ?? DateTime.now().toIso8601String(),
+            };
+          }
+          return null;
+        }).whereType<Map<String, dynamic>>().toList();
+        
+        // Sort the incomes by timestamp
         incomes.sort((a, b) => DateTime.parse(b['timestamp'])
             .compareTo(DateTime.parse(a['timestamp'])));
         
         return Card(
           elevation: 4,
-          child: ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: incomes.take(5).length,
-            separatorBuilder: (_, __) => Divider(height: 1),
-            itemBuilder: (context, index) {
-              final income = incomes[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Icon(Icons.money),
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                ),
-                title: Text(income['source']),
-                subtitle: Text(
-                  DateFormat('MMM d, yyyy').format(
-                    DateTime.parse(income['timestamp']),
+          child: incomes.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text('No income records yet'),
                   ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: incomes.take(5).length,
+                  separatorBuilder: (_, __) => Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final income = incomes[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Icon(Icons.money),
+                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                      ),
+                      title: Text(income['source']),
+                      subtitle: Text(
+                        DateFormat('MMM d, yyyy').format(
+                          DateTime.parse(income['timestamp']),
+                        ),
+                      ),
+                      trailing: Text(
+                        '₹${income['amount'].toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                trailing: Text(
-                  '₹${income['amount'].toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            },
-          ),
         );
       },
     );
