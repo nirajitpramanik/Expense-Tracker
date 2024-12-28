@@ -7,6 +7,7 @@ import 'pages/expense_list.dart';
 import 'pages/debts_page.dart';
 import 'pages/budget_page.dart';
 import 'pages/expense_settings.dart';
+import 'pages/reports_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -157,6 +158,17 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => DebtsPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.analytics),
+              title: Text('Reports'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReportsPage()),
                 );
               },
             ),

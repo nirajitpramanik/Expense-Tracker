@@ -1,12 +1,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Basic Permissions -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Scoped and Manage External Storage Permissions -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Required for MANAGE_EXTERNAL_STORAGE -->
     <application
         android:label="Expense Tracker"
         android:name="${applicationName}"
-        android:icon="@mipmap/expense_tracker">
+        android:icon="@mipmap/expense_tracker"
+        android:requestLegacyExternalStorage="true"> <!-- For Android 10 compatibility -->
         
         <activity
             android:name=".MainActivity"
@@ -16,6 +25,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+            
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
@@ -25,10 +35,9 @@
             </intent-filter>
         </activity>
 
-        <!-- Flutter Plugin Metadata -->
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+        <activity
+            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+            android:exported="false"/>
 
         <!-- Notification Listener Service -->
         <service
@@ -39,6 +48,11 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- Flutter Plugin Metadata -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
 
     </application>
 </manifest>
